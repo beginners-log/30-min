@@ -6,7 +6,13 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+
     steps:
+      - name: Add mask
+        run: |
+          TOKEN=${{ secrets.CY_DEV_ENV }}
+          ::add-mask::TOKEN
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -14,7 +20,7 @@ jobs:
         run: |
           mkdir config
           touch dev.json
-          echo ${{ secrets.CY_DEV_ENV }} | base64 -d > config/dev.json
+          echo TOKEN | base64 -d > config/dev.json
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
