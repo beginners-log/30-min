@@ -1,0 +1,41 @@
+name: JQ
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Mask Secrets
+        run: |
+          if [ ! -x "$(command -v jq)" ]; then
+            echo "jq not found, installing..."
+            sudo apt-get update
+            sudo apt-get install -y jq
+          fi
+          # Decode and mask secrets
+          echo "${{ secrets.CY_DEV_ENV }}" | base64 -d | jq -c 'def mask_values: . as $in | if type == "object" then with_entries(.value |= mask_values) elif type == "array" then map(mask_values) elif type == "string" then "***" else . end; mask_values' | while IFS= read -r line; do
+            # Extract strings from the JSON to mask them
+            for value in $(echo "$line" | jq -r '.. | select(type == "string")'); do
+              # Mask the value in the logs
+              echo "::add-mask::$value"
+            done
+            # Print the masked line to the logs
+            echo "$line"
+          done
+      - name: Envs After
+        run: echo "Env values after"
+
+      - name: Use secrets
+        run: |
+          mkdir -p config
+          echo "${{ secrets.CY_DEV_ENV }}" | base64 -d > config/dev.json
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          start: npm run test
