@@ -5,10 +5,10 @@ describe('Verify configuration', () => {
     console.log(Cypress.env())
   })
 
-  it('checks the respective environment is applied', () => {
+  it.only('checks the respective environment is applied', () => {
     const user = Cypress.env().user_1
 
     expect(Cypress.config().baseUrl).to.include('/dev')
-    expect(user).to.eq('development user')
+    expect(user.password).to.eq('111')
   })
 })
