@@ -1,4 +1,4 @@
-name: cy workflow with jq
+name: JQ
 
 on:
   workflow_dispatch:
