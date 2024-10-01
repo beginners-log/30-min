@@ -1,4 +1,4 @@
-describe('Verify configuration', () => {
+describe.only('Verify configuration', () => {
   it('checks linter rules are applied', () => {
     let i
     cy.wait(400)
@@ -9,6 +9,6 @@ describe('Verify configuration', () => {
     const user = Cypress.env().user_1
 
     expect(Cypress.config().baseUrl).to.include('/dev')
-    expect(user.password).to.eq('111')
+    expect(user.password).to.eq('111', { log: false })
   })
 })
